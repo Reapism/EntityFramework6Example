@@ -1,4 +1,5 @@
 ﻿using NinjaDomain.Classes;
+using NinjaDomain.Classes.Enums;
 using NinjaDomain.DataModel;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,9 @@ namespace ConsoleApplication
         {
             // Stop EF the database initialization process when working with NinjaContext
             Database.SetInitializer(new NullDatabaseInitializer<NinjaContext>());
-            QueryAndUpdateNinja();
+
+            SimpleNinjaGraphQuery();
+
             Console.ReadKey();
         }
 
@@ -155,7 +158,7 @@ namespace ConsoleApplication
             ninja.ServedInOniwaban = (!ninja.ServedInOniwaban);
 
             // this is a brand new instance of the context
-            using (var context = new NinjaContext())
+            using (NinjaContext context = new NinjaContext())
             {
                 context.Database.Log = Console.WriteLine;
                 // this still doesn't notify this new context instance
@@ -173,17 +176,17 @@ namespace ConsoleApplication
 
         private static void RetrieveDataWithFind()
         {
-            var keyval = 4;
-            using (var context = new NinjaContext())
+            int keyval = 4;
+            using (NinjaContext context = new NinjaContext())
             {
                 context.Database.Log = Console.WriteLine;
-                var ninja = context.Ninjas.Find(keyval);
+                Ninja ninja = context.Ninjas.Find(keyval);
                 Console.WriteLine($"After Find1: {ninja.Name}");
 
                 // if the object is in memory, it will not query
                 // the db a second time. great for performance
                 // EF does this automagically.
-                var someNinja = context.Ninjas.Find(keyval);
+                Ninja someNinja = context.Ninjas.Find(keyval);
                 Console.WriteLine($"After Find2: {someNinja.Name}");
 
                 ninja = null;
@@ -192,16 +195,141 @@ namespace ConsoleApplication
 
         private static void RetrieveDataWithStoredProc()
         {
-            using (var context = new NinjaContext())
+            using (NinjaContext context = new NinjaContext())
             {
                 context.Database.Log = Console.WriteLine;
-                var ninjas = context.Ninjas.SqlQuery("exec GetOldNinjas");
-               
-                foreach(var ninja in ninjas)
+                System.Data.Entity.Infrastructure.DbSqlQuery<Ninja> ninjas = context.Ninjas.SqlQuery("exec GetOldNinjas");
+
+                foreach (Ninja ninja in ninjas)
                 {
                     Console.WriteLine(ninja.Name);
                 }
+
+                // or use the LINQ execution methods
+
+                List<Ninja> ninjas2 = context.Ninjas.SqlQuery("exec GetOldNinjas").ToList();
             }
         }
+
+        private static void DeleteNinja()
+        {
+            using (NinjaContext context = new NinjaContext())
+            {
+                context.Database.Log = Console.WriteLine;
+                Ninja ninja = context.Ninjas.FirstOrDefault();
+                context.Ninjas.Remove(ninja);
+                context.SaveChanges();
+            }
+        }
+
+        private static void DeleteNinjaCommon()
+        {
+            Ninja ninja;
+            using (NinjaContext context = new NinjaContext())
+            {
+                context.Database.Log = Console.WriteLine;
+                ninja = context.Ninjas.FirstOrDefault();
+            }
+
+            // 1.] this is a new context, so it can't find the ninja
+            // object that was initially queried for.
+            using (NinjaContext context = new NinjaContext())
+            {
+                context.Database.Log = Console.WriteLine;
+
+                // 2.] however, if you attach it
+                // to let this db context instance 
+                // it will now understand.
+                context.Ninjas.Attach(ninja);
+                ninja = context.Ninjas.Remove(ninja);
+
+
+                // even better is to use context.entry
+                // it combines the two statements above
+                context.Entry(ninja).State = EntityState.Deleted;
+                context.SaveChanges();
+            }
+        }
+
+        private static void DeleteNinjaViaStoredProc()
+        {
+            var keyval = 3;
+            using (var context = new NinjaContext())
+            {
+                context.Database.Log = Console.WriteLine;
+                context.Database.ExecuteSqlCommand("exec DeleteNinjaViaId {0}", keyval);
+            }
+        }
+
+        private static void InsertNinjaWithEquipment()
+        {
+            using (var context = new NinjaContext())
+            {
+                context.Database.Log = Console.WriteLine;
+
+                var ninja = new Ninja
+                {
+                    Name = "John Smith",
+                    ServedInOniwaban = false,
+                    DateOfBirth =  new DateTime(1990, 1,14),
+                    ClanId = 1
+                };
+
+                var muscles = new NinjaEquipment
+                {
+                    Name = "Muscles",
+                    Type = EquipmentType.Tool
+                };
+
+                var scythe = new NinjaEquipment
+                {
+                    Name = "Scythe",
+                    Type = EquipmentType.Weapon
+                };
+
+                // All 3 of these statements were
+                // executed in the same DB connection
+
+                context.Ninjas.Add(ninja);
+                ninja.EquipmentOwned.Add(muscles);
+                ninja.EquipmentOwned.Add(scythe);
+                context.SaveChanges();
+            }
+        }
+
+        private static void SimpleNinjaGraphQuery()
+        {
+            using (var context = new NinjaContext())
+            {
+                context.Database.Log = Console.WriteLine;
+
+                // Eagar Loading way: (using include)
+                // brings all the data back in one call!
+                // 
+                // include will say get this additional
+                // however, using multiple ones, will degrades
+                // as you add more.
+                // request the equipment from this ninja
+                var ninja = context.Ninjas.Include(n => n.EquipmentOwned)
+                    .FirstOrDefault(n => n.Name.StartsWith("John"));
+
+                Console.WriteLine($"Ninja Retrieved: {ninja.Name}");
+
+                // Explicit Loading way: (using.Entry().Collection)
+                // Load executes it right away similar to a query execution statement
+                // like FirstOrDefault()
+                context.Entry(ninja).Collection(n => n.EquipmentOwned).Load();
+
+                // Lazy Loading:
+                // See screenshot "lazy loading"
+                // Essentially mark the property you want to retrieve
+                // data from as virtual.
+                // there could be lots of performance issue.
+                // commenting out the context.entry above.
+                Console.WriteLine($"Ninja Equipment Count: {ninja.EquipmentOwned.Count}");
+            }
+        }
+
+
     }
 }
