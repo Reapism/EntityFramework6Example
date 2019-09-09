@@ -8,4 +8,4 @@ https://app.pluralsight.com/library/courses/entity-framework-6-getting-started/t
 This code is *not mine*, and belongs to **Julie Lerman** and her **pluralsight course**. Difference between this repository
 and the original author is my comments to help explain and a few method name changes, local instructions from the course. 
 
->> For questions, or updates, please contact **Julie Lerman**, *the author of the pluralsight course*.
+>> For questions, or updates regarding the course, please contact **Julie Lerman**, *the author of the pluralsight course*.
