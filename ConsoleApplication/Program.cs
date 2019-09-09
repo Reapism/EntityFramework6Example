@@ -11,7 +11,7 @@ namespace ConsoleApplication
     public class Program
     {
         private static void Main(string[] args)
-        {
+     {
             // Stop EF the database initialization process when working with NinjaContext
             Database.SetInitializer(new NullDatabaseInitializer<NinjaContext>());
 
@@ -330,6 +330,20 @@ namespace ConsoleApplication
             }
         }
 
+        private static void ProjectionQuery()
+        {
+            using (var context = new NinjaContext())
+            {
+                context.Database.Log = Console.WriteLine;
+                // this pulls all equipments from each ninja even if the
+                // equipments are empty!
+                var ninjas = context.Ninjas
+                    .Select(n => new { n.Name, n.DateOfBirth, n.EquipmentOwned })
+                    .ToList();
+
+            }
+
+        }
 
     }
 }

@@ -1,11 +1,12 @@
 ﻿using NinjaDomain.Classes.Enums;
+using NinjaDomain.Classes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace NinjaDomain.Classes
 {
-    public class Ninja
+    public class Ninja : IModificationHistory
     {
         public Ninja()
         {
@@ -18,25 +19,9 @@ namespace NinjaDomain.Classes
         public int ClanId { get; set; }
         public List<NinjaEquipment> EquipmentOwned { get; set; }
         public DateTime DateOfBirth { get; set; }
-    }
 
-    public class Clan
-    {
-        public Clan()
-        {
-            Ninjas = new List<Ninja>();
-        }
-        public int Id { get; set; }
-        public string ClanName { get; set; }
-        public List<Ninja> Ninjas { get; set; }
-    }
-
-    public class NinjaEquipment
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public EquipmentType Type { get; set; }
-        [Required] // See instructions line 
-        public Ninja Ninja { get; set; }
+        public DateTime DateModified { get; set; }
+        public DateTime DateCreated { get; set; }
+        public bool IsDirty { get; set; }
     }
 }
