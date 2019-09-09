@@ -1,32 +1,25 @@
-﻿using System;
+﻿using NinjaDomain.Classes;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data.Entity;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NinjaDomain.DataModel
 {
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Data;
-    using System.Linq;
-  
-    using NinjaDomain.Classes;
-    using System.Data.Entity;
 
 
     namespace Repository
     {
         public class ConnectedRepository
         {
-            readonly NinjaContext _context = new NinjaContext();
+            private readonly NinjaContext _context = new NinjaContext();
 
-           
+
             public Ninja NewNinja()
             {
-                var ninja=new Ninja
+                Ninja ninja = new Ninja
                 {
-                    
+
                 };
                 _context.Ninjas.Add(ninja);
                 return ninja;
@@ -34,7 +27,7 @@ namespace NinjaDomain.DataModel
 
             public Ninja GetNinjaWithEquipment(int id)
             {
-                return _context.Ninjas.Include(n=>n.EquipmentOwned)
+                return _context.Ninjas.Include(n => n.EquipmentOwned)
                   .FirstOrDefault(n => n.Id == id);
             }
 
@@ -68,7 +61,7 @@ namespace NinjaDomain.DataModel
                 //you can't remove from or add to a collection in a foreach loop
                 for (int i = _context.Ninjas.Local.Count; i > 0; i--)
                 {
-                    var ninja = _context.Ninjas.Local[i - 1];
+                    Ninja ninja = _context.Ninjas.Local[i - 1];
                     if (_context.Entry(ninja).State == EntityState.Added
                         && !ninja.IsDirty)
                     {

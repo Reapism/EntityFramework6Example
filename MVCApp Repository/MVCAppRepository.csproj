@@ -21,6 +21,7 @@
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
     <UseGlobalApplicationHostFile />
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -188,12 +189,12 @@
     <Content Include="Scripts\jquery-1.10.2.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Ninja.DomainClasses\NinjaDomain.Classes.csproj">
-      <Project>{7073f7fe-f900-4bdd-8b10-6bc3d88302d1}</Project>
+    <ProjectReference Include="..\NinjaDomain.Classes\NinjaDomain.Classes.csproj">
+      <Project>{2e096c96-6ef8-4132-8033-7ade885177f5}</Project>
       <Name>NinjaDomain.Classes</Name>
     </ProjectReference>
     <ProjectReference Include="..\NinjaDomain.DataModel\NinjaDomain.DataModel.csproj">
-      <Project>{45e2e512-ee42-4d8e-ab18-3c66e0644b7a}</Project>
+      <Project>{fb527463-69de-4fc1-a3f8-b686a3010fbd}</Project>
       <Name>NinjaDomain.DataModel</Name>
     </ProjectReference>
   </ItemGroup>
