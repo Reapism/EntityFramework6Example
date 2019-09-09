@@ -24,6 +24,8 @@ namespace NinjaDomain.DataModel
 
         public override int SaveChanges()
         {
+            // Give me everything its tracking that implements 
+            // IModificationHistory and is known to be modified or added.
             foreach (IModificationHistory history in ChangeTracker.Entries()
                 .Where(e => e.Entity is IModificationHistory && (e.State == EntityState.Added ||
                 e.State == EntityState.Modified))
