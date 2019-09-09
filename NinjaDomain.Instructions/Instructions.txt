@@ -1,0 +1,35 @@
+﻿Written instructions.
+
+SETUP-----------------------------------------------------
+---------------------------------------------------------
+Project that contains our pocos. (Plain old CLR objects)
+
+Project that references our pocos (DataModel).
+
+Tools/Extensions and Updates/ Find (Entity Framework 6 Power Tools)
+-- Helps us see the datamodel visually.
+
+
+
+
+
+INFORMATION-----------------------------------------------------------
+----------------------------------------------------------------------
+Where your DBContext project is, make sure it is the startup project.
+
+e.g NinjaDomain.DataModel
+
+The Entity Framework 6 Power Tools is attempting to look for the app.config which
+is located in the NinjaDomain.DataModel project.
+
+Right click the NinjaContext class in the DataModel project, then EntityFramework/ View Entity Data Model
+
+Why is the [Required] tag there
+
+
+See screenshots 5-8 
+
+
+New Project EDMXFromDB
+
+Create a EntityDataModel
